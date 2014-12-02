@@ -1,7 +1,7 @@
 Minetest 0.4 mod: money
 =======================
 
-This mod has been edited by TenPlus1
+This mod has been edited by TenPlus1 to remove everything but the barter shops
 
 The original can be found in:
   https://github.com/kotolegokot/minetest-mod-money
