@@ -80,6 +80,7 @@ minetest.register_node("money:barter_shop", {
 	on_construct = function(pos)
 		local meta = minetest.env:get_meta(pos)
 		meta:set_string("formspec", "size[8,5.6]"..
+			default.gui_bg..default.gui_bg_img..default.gui_slots..
 			"field[0.256,0.5;8,1;bartershopname;Name of your barter shop:;]"..
 			"field[0.256,1.5;8,1;nodename1;Name node (A) shop will give to player:;]"..
 			"field[0.256,2.5;8,1;nodename2;Name node (B) player will give to shop:;]"..
@@ -97,6 +98,7 @@ minetest.register_node("money:barter_shop", {
 		local meta = minetest.env:get_meta(pos)
 		if player:get_player_name() == meta:get_string("owner") then
 		meta:set_string("formspec", "size[8,5.6]"..
+			default.gui_bg..default.gui_bg_img..default.gui_slots..
 			"field[0.256,0.5;8,1;bartershopname;Name of your barter shop:;${bartershopname}]"..
 			"field[0.256,1.5;8,1;nodename1;Name node (A) shop will give to player:;${nodename1}]"..
 			"field[0.256,2.5;8,1;nodename2;Name node (B) player will give to shop:;${nodename2}]"..
@@ -139,6 +141,8 @@ minetest.register_node("money:barter_shop", {
 					minetest.pos_to_string(pos))
 			return 0
 		end
+		-- if item is worn dont put into shop
+		if stack:get_wear() > 0 then return 0 end
 		return stack:get_count()
 	end,
 
@@ -182,6 +186,7 @@ minetest.register_node("money:barter_shop", {
 			and (meta:get_string("owner") == sender:get_player_name()
 			or minetest.get_player_privs(sender:get_player_name())["money_admin"]) then
 				meta:set_string("formspec", "size[8,10;]"..
+					default.gui_bg..default.gui_bg_img..default.gui_slots..
 					"list[context;main;0,0;8,4;]"..
 					"label[0.256,4.2;Shop takes "..fields.amount2.." "..fields.nodename2.."]" ..
 					"label[0.256,4.5;and gives "..fields.amount1.." "..fields.nodename1.."]"..
@@ -246,6 +251,7 @@ minetest.register_node("money:admin_barter_shop", {
 	on_construct = function(pos)
 		local meta = minetest.env:get_meta(pos)
 		meta:set_string("formspec", "size[8,4.6]"..
+			default.gui_bg..default.gui_bg_img..default.gui_slots..
 			"field[0.256,0.5;8,1;nodename1;What kind of a node do you want to exchange:;]"..
 			"field[0.256,1.5;8,1;nodename2;for:;]"..
 			"field[0.256,2.5;8,1;amount1;Amount of first kind of node:;]"..
@@ -269,6 +275,7 @@ minetest.register_node("money:admin_barter_shop", {
 			and (meta:get_string("owner") == sender:get_player_name()
 			or minetest.get_player_privs(sender:get_player_name())["money_admin"]) then
 				meta:set_string("formspec", "size[8,6;]"..
+					default.gui_bg..default.gui_bg_img..default.gui_slots..
 					"label[0.256,0.0;"..fields.amount2.." "..fields.nodename2.." --> "..fields.amount1.." "..fields.nodename1.."]"..
 					"button[3.1,0.5;2,1;button;Exchange]"..
 					"list[current_player;main;0,1.5;8,4;]")
