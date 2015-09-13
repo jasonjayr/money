@@ -145,7 +145,8 @@ minetest.register_node("money:barter_shop", {
 					"label[0.256,4.2;Shop takes "..fields.amount2.." "..fields.nodename2.."]" ..
 					"label[0.256,4.5;and gives "..fields.amount1.." "..fields.nodename1.."]"..
 					"button[3.1,5;2,1;button;Swap]"..
-					"list[current_player;main;0,6;8,4;]")
+					"list[current_player;main;0,6;8,4;]"..
+					"listring[]")
 				meta:set_string("bartershopname", fields.bartershopname)
 				meta:set_string("nodename1", fields.nodename1)
 				meta:set_string("nodename2", fields.nodename2)
