@@ -2,6 +2,7 @@ Minetest 0.4 mod: money
 =======================
 
 This mod has been edited by TenPlus1 to remove everything but the barter shops
+tidy code and formspecs, and add a new /holding command to help players setup shop.
 
 The original can be found in:
   https://github.com/kotolegokot/minetest-mod-money

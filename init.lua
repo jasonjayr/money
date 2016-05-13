@@ -361,3 +361,33 @@ minetest.register_node("money:admin_barter_shop", {
 		end
 	end,
 })
+
+-- add /holding command to tell player what they are holding
+
+minetest.register_chatcommand("holding", {
+	params = "",
+	description = "show node name of item in hand",
+	privs = {},
+
+	func = function(name, param)
+
+		local player = minetest.get_player_by_name(name)
+
+		if player == nil then
+			minetest.log("error", "Unable to get info, player is nil")
+			return true
+		end
+
+		if player:get_wielded_item():is_empty() then
+			minetest.chat_send_player(name, 'no item in hand.')
+		else
+			minetest.chat_send_player(name,
+				'holding: name = '
+				..player:get_wielded_item():get_name()
+				..' , count = '
+				.. player:get_wielded_item():get_count()
+				..' , wear = '
+				.. player:get_wielded_item():get_wear() )
+		end
+	end,
+})
