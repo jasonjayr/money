@@ -22,28 +22,34 @@ minetest.register_node("money:barter_shop", {
 		"default_chest_side.png",
 		"default_chest_front.png^money_barter_shop_front.png"
 	},
-	groups = {snappy=2,choppy=2,oddly_breakable_by_hand=2},
+	groups = {snappy = 2, choppy = 2, oddly_breakable_by_hand = 2},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype2 = "facedir",
 
 	after_place_node = function(pos, placer)
+
 		local meta = minetest.get_meta(pos)
+
 		meta:set_string("owner", placer:get_player_name())
-		meta:set_string("infotext", "Untuned Barter Shop (owned by " .. placer:get_player_name() .. ")")
+		meta:set_string("infotext", "Untuned Barter Shop (owned by "
+			.. placer:get_player_name() .. ")")
 	end,
 
 	on_construct = function(pos)
+
 		local meta = minetest.get_meta(pos)
-		meta:set_string("formspec", "size[8,5.6]"
+
+		meta:set_string("formspec", "size[8,7]"
 			.. default.gui_bg
 			.. default.gui_bg_img
 			.. default.gui_slots
-			.. "field[0.256,0.5;8,1;bartershopname;Name of barter shop:;]"
-			.. "field[0.256,1.5;8,1;nodename1;Node name (A) shop gives to player:;]"
-			.. "field[0.256,2.5;8,1;nodename2;Node name (B) player gives to shop:;]"
-			.. "field[0.256,3.5;8,1;amount1;Quantity of node A per swap:;]"
-			.. "field[0.256,4.5;8,1;amount2;Quantity of node B per swap:;]"
-			.. "button_exit[3.1,5;2,1;button;Tune]")
+			.. "field[0.3,0.50;8,1;bartershopname;Shop name:;]"
+			.. "field[0.3,1.75;8,1;nodename1;Name of item to give player:;]"
+			.. "field[0.3,3.00;8,1;amount1;How many to give:;]"
+			.. "field[0.3,4.25;8,1;nodename2;Name of what shop wants in return:;]"
+			.. "field[0.3,5.50;8,1;amount2;Number to take:;]"
+			.. "button_exit[3,6.25;2,1;button;Tune]")
+
 		meta:set_string("infotext", "Untuned Barter Shop")
 		meta:set_string("owner", "")
 		meta:set_string("form", "yes")
@@ -51,68 +57,96 @@ minetest.register_node("money:barter_shop", {
 
 	-- retune
 
-	on_punch = function( pos, node, player )
+	on_punch = function(pos, node, player)
+
 		local meta = minetest.get_meta(pos)
-		if player:get_player_name() == meta:get_string("owner") then
-		meta:set_string("formspec", "size[8,5.6]"
+
+		if player:get_player_name() ~= meta:get_string("owner") then
+			return
+		end
+
+		meta:set_string("formspec", "size[8,7]"
 			.. default.gui_bg
 			.. default.gui_bg_img
 			.. default.gui_slots
-			.. "field[0.256,0.5;8,1;bartershopname;Name of barter shop:;${bartershopname}]"
-			.. "field[0.256,1.5;8,1;nodename1;Node name (A) shop gives to player:;${nodename1}]"
-			.. "field[0.256,2.5;8,1;nodename2;Node name (B) player gives to shop:;${nodename2}]"
-			.. "field[0.256,3.5;8,1;amount1;Quantity of node A per swap:;${amount1}]"
-			.. "field[0.256,4.5;8,1;amount2;Quantity of node B per swap:;${amount2}]"
-			.. "button_exit[3.1,5;2,1;button;Retune]")
-			meta:set_string("infotext", "Detuned Barter Shop")
-			meta:set_string("form", "yes")
-			minetest.chat_send_player(player:get_player_name(), "Barter Shop detuned.")
-		end
+			.. "field[0.3,0.50;8,1;bartershopname;Shop name:;${bartershopname}]"
+			.. "field[0.3,1.75;8,1;nodename1;Name of item to give player:;${nodename1}]"
+			.. "field[0.3,3.00;8,1;amount1;How many to give:;${amount1}]"
+			.. "field[0.3,4.25;8,1;nodename2;Name of what shop wants in return:;${nodename2}]"
+			.. "field[0.3,5.50;8,1;amount2;Number to take:;${amount2}]"
+			.. "button_exit[3,6.25;2,1;button;Retune]")
+
+		meta:set_string("infotext", "Detuned Barter Shop")
+		meta:set_string("form", "yes")
+
+		minetest.chat_send_player(player:get_player_name(), "Barter Shop detuned.")
 	end,
 
 	-- end retune
 
-	can_dig = function(pos,player)
+	can_dig = function(pos, player)
+
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
-		return inv:is_empty("main") and (meta:get_string("owner") == player:get_player_name() or minetest.get_player_privs(player:get_player_name())["server"])
+
+		return inv:is_empty("main")
+			and (meta:get_string("owner") == player:get_player_name()
+			or minetest.get_player_privs(player:get_player_name())["protection_bypass"])
 	end,
 
 	allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+
 		local meta = minetest.get_meta(pos)
+
 		if not has_shop_privilege(meta, player) then
-			minetest.log("action", player:get_player_name()..
-				" tried to access barter shop belonging to "..
-				meta:get_string("owner").." at "..
-				minetest.pos_to_string(pos))
+
+			minetest.log("action", player:get_player_name()
+				.. " tried to access barter shop belonging to "
+				.. meta:get_string("owner").." at "
+				.. minetest.pos_to_string(pos))
+
 			return 0
 		end
+
 		return count
 	end,
 
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+
 		local meta = minetest.get_meta(pos)
+
 		if not has_shop_privilege(meta, player) then
-			minetest.log("action", player:get_player_name()..
-				" tried to access barter shop belonging to "..
-				meta:get_string("owner").." at "..
-				minetest.pos_to_string(pos))
+
+			minetest.log("action", player:get_player_name()
+				.. " tried to access barter shop belonging to "
+				.. meta:get_string("owner").." at "
+				.. minetest.pos_to_string(pos))
+
 			return 0
 		end
+
 		-- if item is worn do not put in shop
-		if stack:get_wear() > 0 then return 0 end
+		if stack:get_wear() > 0 then
+			return 0
+		end
+
 		return stack:get_count()
 	end,
 
 	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+
 		local meta = minetest.get_meta(pos)
+
 		if not has_shop_privilege(meta, player) then
-			minetest.log("action", player:get_player_name()..
-				" tried to access barter shop belonging to "..
-				meta:get_string("owner").." at "..
-				minetest.pos_to_string(pos))
+
+			minetest.log("action", player:get_player_name()
+				.. " tried to access barter shop belonging to "
+				.. meta:get_string("owner").." at "
+				.. minetest.pos_to_string(pos))
+
 			return 0
 		end
+
 		return stack:get_count()
 	end,
 --[[
@@ -145,7 +179,7 @@ minetest.register_node("money:barter_shop", {
 			and tonumber(fields.amount2)
 			and tonumber(fields.amount2) >= 1
 			and (meta:get_string("owner") == sender:get_player_name()
-			or minetest.get_player_privs(sender:get_player_name())["server"]) then
+			or minetest.get_player_privs(sender:get_player_name())["protection_bypass"]) then
 
 				meta:set_string("formspec", "size[8,10]"
 					.. default.gui_bg
@@ -168,9 +202,7 @@ minetest.register_node("money:barter_shop", {
 				meta:set_string("amount2", fields.amount2)
 				meta:set_string("infotext", "Barter Shop \"" .. fields.bartershopname .. "\" (owned by " .. meta:get_string("owner") .. ")")
 				meta:set_string("form", "no")
-
-				local inv = meta:get_inventory()
-				inv:set_size("main", 8*4)
+				meta:get_inventory():set_size("main", 8*4)
 			end
 
 		elseif fields["button"] then
@@ -196,11 +228,23 @@ minetest.register_node("money:barter_shop", {
 				return
 			end
 
+			-- take items from shop
 			inv:remove_item("main", meta:get_string("nodename1") .. " " .. meta:get_string("amount1"))
+
+			-- take items from player
 			sender_inv:remove_item("main", meta:get_string("nodename2") .. " " .. meta:get_string("amount2"))
+
+			-- add items to shop
 			inv:add_item("main", meta:get_string("nodename2") .. " " .. meta:get_string("amount2"))
+
+			-- give paid for items to player
 			sender_inv:add_item("main", meta:get_string("nodename1") .. " " .. meta:get_string("amount1"))
-			minetest.chat_send_player(sender_name, "You exchanged " .. meta:get_string("amount2") .. " " .. meta:get_string("nodename2") .. " for " .. meta:get_string("amount1") .. " " .. meta:get_string("nodename1") .. ".")
+
+			minetest.chat_send_player(sender_name, "You exchanged "
+				.. meta:get_string("amount2") .. " "
+				.. meta:get_string("nodename2") .. " for "
+				.. meta:get_string("amount1") .. " "
+				.. meta:get_string("nodename1") .. ".")
 		end
 	end,
 })
@@ -213,7 +257,7 @@ minetest.register_craft({
 	recipe = {"default:sign_wall", "default:chest_locked"},
 })
 
--- Admin barter shop.
+-- Admin barter shop
 
 minetest.register_node("money:admin_barter_shop", {
 	description = "Admin Barter Shop",
@@ -224,7 +268,7 @@ minetest.register_node("money:admin_barter_shop", {
 		"default_chest_side.png",
 		"default_chest_side.png",
 		"default_chest_front.png^money_admin_barter_shop_front.png"},
-	groups = {snappy=2,choppy=2,oddly_breakable_by_hand=2},
+	groups = {snappy = 2, choppy = 2, oddly_breakable_by_hand = 2},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype2 = "facedir",
 
@@ -247,7 +291,7 @@ minetest.register_node("money:admin_barter_shop", {
 	end,
 
 	can_dig = function(pos,player)
-		return minetest.get_player_privs(player:get_player_name())["protection_bypass"] -- was server
+		return minetest.get_player_privs(player:get_player_name())["protection_bypass"]
 	end,
 
 	on_receive_fields = function(pos, formname, fields, sender)
@@ -258,10 +302,12 @@ minetest.register_node("money:admin_barter_shop", {
 
 			if minetest.registered_items[fields.nodename1]
 			and minetest.registered_items[fields.nodename2]
-			and tonumber(fields.amount1) and tonumber(fields.amount1) >= 1
-			and tonumber(fields.amount2) and tonumber(fields.amount2) >= 1
+			and tonumber(fields.amount1)
+			and tonumber(fields.amount1) >= 1
+			and tonumber(fields.amount2)
+			and tonumber(fields.amount2) >= 1
 			and (meta:get_string("owner") == sender:get_player_name()
-			or minetest.get_player_privs(sender:get_player_name())["server"]) then
+			or minetest.get_player_privs(sender:get_player_name())["protection_bypass"]) then
 
 				meta:set_string("formspec", "size[8,6]"
 					.. default.gui_bg
@@ -301,10 +347,17 @@ minetest.register_node("money:admin_barter_shop", {
 				return
 			end
 
+			-- take payment from player
 			sender_inv:remove_item("main", meta:get_string("nodename2") .. " " .. meta:get_string("amount2"))
+
+			-- add item(s) you purchased
 			sender_inv:add_item("main", meta:get_string("nodename1") .. " " .. meta:get_string("amount1"))
 
-			minetest.chat_send_player(sender_name, "You exchanged " .. meta:get_string("amount2") .. " " .. meta:get_string("nodename2") .. " on " .. meta:get_string("amount1") .. " " .. meta:get_string("nodename1") .. ".")
+			minetest.chat_send_player(sender_name, "You exchanged "
+				.. meta:get_string("amount2") .. " "
+				.. meta:get_string("nodename2") .. " on "
+				.. meta:get_string("amount1") .. " "
+				.. meta:get_string("nodename1") .. ".")
 		end
 	end,
 })
