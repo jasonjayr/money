@@ -241,9 +241,9 @@ minetest.register_node("money:barter_shop", {
 			sender_inv:add_item("main", meta:get_string("nodename1") .. " " .. meta:get_string("amount1"))
 
 			minetest.chat_send_player(sender_name, "You exchanged "
-				.. meta:get_string("amount2") .. " "
+				.. meta:get_string("amount2") .. "x "
 				.. meta:get_string("nodename2") .. " for "
-				.. meta:get_string("amount1") .. " "
+				.. meta:get_string("amount1") .. "x "
 				.. meta:get_string("nodename1") .. ".")
 		end
 	end,
@@ -354,9 +354,9 @@ minetest.register_node("money:admin_barter_shop", {
 			sender_inv:add_item("main", meta:get_string("nodename1") .. " " .. meta:get_string("amount1"))
 
 			minetest.chat_send_player(sender_name, "You exchanged "
-				.. meta:get_string("amount2") .. " "
-				.. meta:get_string("nodename2") .. " on "
-				.. meta:get_string("amount1") .. " "
+				.. meta:get_string("amount2") .. "x "
+				.. meta:get_string("nodename2") .. " for "
+				.. meta:get_string("amount1") .. "x "
 				.. meta:get_string("nodename1") .. ".")
 		end
 	end,
